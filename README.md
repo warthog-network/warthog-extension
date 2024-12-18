@@ -21,7 +21,7 @@ Follow these steps to install and run the Warthog Wallet Extension:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/Crypto-Pioneers/warthog-wallet-extension.git
+   git clone https://github.com/warthog-network/warthog-extension.git
 
    cd warthog-wallet-extension
    ```
