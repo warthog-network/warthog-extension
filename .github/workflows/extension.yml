@@ -26,8 +26,14 @@ jobs:
           cd build
           zip -r -FS ../extension.zip * --exclude '*.git*'
 
-      
-          
+      - name: sign the extension
+        uses: cardinalby/webext-buildtools-firefox-sign-xpi-action@v1
+        with:
+          zipFilePath: 'extension.zip'
+          xpiFilePath: 'extension.signed.xpi'
+          jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
+          jwtSecret: ${{ secrets.FF_JWT_SECRET }}
+     
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
