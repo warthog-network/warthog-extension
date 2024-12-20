@@ -38,5 +38,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name : 0.0.1
-          files: extension.zip
+          files: |
+            extension.zip
+            extension.signed.xpi
 
