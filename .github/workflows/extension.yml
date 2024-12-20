@@ -23,7 +23,10 @@ jobs:
 
       - name: Zip Extension
         run: |
-          zip -r extension.zip build/
+          cd build
+          zip -r -FS ../extension.zip * --exclude '*.git*'
+
+      
           
       - name: Release
         uses: softprops/action-gh-release@v2
