@@ -33,7 +33,8 @@ jobs:
           xpiFilePath: 'extension.signed.xpi'
           jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
           jwtSecret: ${{ secrets.FF_JWT_SECRET }}
-     
+        continue-on-error: true
+
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
