@@ -34,7 +34,7 @@ jobs:
           jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
           jwtSecret: ${{ secrets.FF_JWT_SECRET }}
           extensionId: ${{ secrets.FF_EXTENSION_ID }}
-        continue-on-error: true
+        
 
       - name: Release
         uses: softprops/action-gh-release@v2
