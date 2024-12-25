@@ -33,6 +33,7 @@ jobs:
           xpiFilePath: 'extension.signed.xpi'
           jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
           jwtSecret: ${{ secrets.FF_JWT_SECRET }}
+          extensionId: ${{ secrets.FF_EXTENSION_ID }}
         continue-on-error: true
 
       - name: Release
