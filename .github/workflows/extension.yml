@@ -21,6 +21,12 @@ jobs:
       - run: npm ci
       - run: npm run build
 
+      - name: Extract version from manifest.json
+        id: get_version
+        run: |
+          VERSION=$(grep '"version"' public/manifest.json | sed -E 's/.*"version": "([^"]+)".*/\1/')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
       - name: Zip Extension
         run: |
           cd build
@@ -40,7 +46,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name : 1.0.3
+          tag_name : ${{ env.VERSION }}
           files: |
             extension.zip
             extension.signed.xpi
