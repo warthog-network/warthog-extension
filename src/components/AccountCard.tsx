@@ -20,10 +20,10 @@ const AccountCard = ({
     isLast: boolean;
     setPrimaryAccount: (id: number) => void;
 }) => {
-    const { selectedWalletIndex } = useWallet();
+    const { selectedWalletIndex, accountPath } = useWallet();
     return (
         <>
-            <div className="flex justify-between items-center w-full mt-6 relative">
+            <div className="flex justify-between items-center w-full mt-6 relative cursor-pointer" onClick={()=>setPrimaryAccount(id)}>
                 <div className="flex items-center gap-4">
                     {/* <img
                         className="w-12 h-12 rounded-full object-cover"
@@ -34,6 +34,7 @@ const AccountCard = ({
                     <div>
                         <div className="text-white text-xl font-semibold">{name}</div>
                         <div className="text-white/50 text-xs">{formatWalletAddress(address)}</div>
+                        <div className="text-white/70 text-xs">{accountPath(selectedWalletIndex)}</div>
                     </div>
                 </div>
                 <div className="flex items-center gap-3 cursor-pointer">
@@ -45,7 +46,7 @@ const AccountCard = ({
                 {
                     selectedWalletIndex === id ? 
                         <IoIosCheckmarkCircle className="w-6 h-6 cursor-pointer"/> : 
-                        <IoIosCheckmarkCircleOutline className="w-6 h-6 cursor-pointer" onClick={()=>setPrimaryAccount(id)}/>
+                        <IoIosCheckmarkCircleOutline className="w-6 h-6 cursor-pointer" />
                 }
             </div>
             {!isLast && <div className="h-[0px] border border-white/20 my-3" />}
