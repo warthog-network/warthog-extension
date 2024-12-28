@@ -103,7 +103,6 @@ function SendFinalStep() {
             console.log(`**** signHash:`, signHash);
 
             const privKey = getPrivateKeyFromIndex(selectedWalletIndex);
-            console.log(`**** privKey:`, privKey);
             const signed = secp256k1.ecdsaSign(Uint8Array.from(Buffer.from(signHash, "hex")), Uint8Array.from(Buffer.from(privKey, "hex")));
             console.log(`**** signed:`, signed);
             const signatureWithoutRecid = Buffer.from(signed.signature);

@@ -34,6 +34,7 @@ interface WalletContextProps {
     token: string | null;
     setToken: (token: string) => void;
     clearToken: () => void;
+    accountPath: (index: number) => string;
     newWallet: () => void;
     addAccount: (name: string | null) => void;
     importWallet: (seedPhrase: string) => void;
@@ -140,6 +141,11 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             console.error(`Error loading ${key} from browser storage:`, error);
         }
     }, []);
+
+    const accountPath = (index: number): string => {
+        const path = `m/44'/2070'/0/0/${index}`;
+        return path;
+    }
 
     const newWallet = async (): Promise<void> => {
         try {
@@ -371,6 +377,7 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
                 visibleWalletList,
                 tmpDestinationWallet,
                 inputWordsBackup,
+                accountPath,
                 setSeedPhrase,
                 setWallet,
                 setPassword,

@@ -5,7 +5,7 @@ import Jazzicon from "react-jazzicon/dist/Jazzicon";
 import useWallet from "../hooks/useWallet";
 
 const ProfileHeader: React.FC = () => {
-    const { selectedWalletIndex } = useWallet();
+    const { selectedWalletIndex, accountPath } = useWallet();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { name, clearToken } = useWallet();
     const navigate = useNavigate();
@@ -45,7 +45,7 @@ const ProfileHeader: React.FC = () => {
                 <Jazzicon diameter={60} seed={selectedWalletIndex} />
                 <div className="grid gap-1">
                     <h1 className="text-white text-xl font-semibold">{name}</h1>
-                    <p className="text-white/30 text-xs font-normal">Connected Wallet</p>
+                    <p className="text-white/30 text-xs font-normal">{accountPath(selectedWalletIndex)}</p>
                 </div>
             </div>
             <div className="relative" ref={menuRef}>
