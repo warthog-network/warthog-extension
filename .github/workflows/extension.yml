@@ -29,6 +29,7 @@ jobs:
       - name: sign the extension
         uses: cardinalby/webext-buildtools-firefox-sign-xpi-action@v1
         with:
+          timeoutMs: 200000
           zipFilePath: 'extension.zip'
           xpiFilePath: 'extension.signed.xpi'
           jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
@@ -39,7 +40,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name : 0.0.1
+          tag_name : 1.0.3
           files: |
             extension.zip
             extension.signed.xpi
