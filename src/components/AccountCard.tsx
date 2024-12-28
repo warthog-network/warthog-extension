@@ -34,7 +34,7 @@ const AccountCard = ({
                     <div>
                         <div className="text-white text-xl font-semibold">{name}</div>
                         <div className="text-white/50 text-xs">{formatWalletAddress(address)}</div>
-                        <div className="text-white/70 text-xs">{accountPath(selectedWalletIndex)}</div>
+                        <div className="text-white/70 text-xs">{accountPath(id)}</div>
                     </div>
                 </div>
                 <div className="flex items-center gap-3 cursor-pointer">
