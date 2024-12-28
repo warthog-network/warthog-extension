@@ -59,12 +59,12 @@ const defaultNodeList = [
 ];
 
 const defaultNodeNameList = [
-    'Main node',
-    'Quick node',
-    'Global node',
-    'Public node',
-    'Epic node',
-    'Official node'
+    'pumbaa',
+    'blu & EU',
+    'blu & Central US',
+    'polaire',
+    'blu & Asia',
+    'johnnyb Us East'
 ];
 
 const WalletContext = createContext<WalletContextProps | undefined>(undefined);

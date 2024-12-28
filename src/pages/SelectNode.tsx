@@ -140,7 +140,7 @@ function SelectNode() {
 
     return (
         <div className="min-h-screen container relative px-4">
-            <Header title="Select an Node" />
+            <Header title="Select A Node" />
             <div className="relative w-full">
                 <input
                     className="h-14 w-full pl-12 pr-4 py-2 bg-primary/10 rounded-full border border-primary focus:outline-none focus:ring-2 focus:ring-primary"
