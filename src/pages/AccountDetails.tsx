@@ -4,6 +4,7 @@ import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
 import useWallet from "../hooks/useWallet";
 import Jazzicon from "react-jazzicon/dist/Jazzicon";
+import { QRCodeSVG } from 'qrcode.react';
 
 function IconButton({ iconSrc, label, onClick }: { iconSrc: string; label: string; onClick?: () => void }) {
     return (
@@ -57,7 +58,7 @@ function AccountDetails() {
     useEffect(() => {
         if (debouncedName !== name) {
             setName(debouncedName || "");
-            setNameList(nameList.map((item, index) => index === selectedWalletIndex ? (debouncedName || "") : item ));
+            setNameList(nameList.map((item, index) => index === selectedWalletIndex ? (debouncedName || "") : item));
         }
     }, [debouncedName, name, nameList, selectedWalletIndex, setName, setNameList]);
 
@@ -71,7 +72,7 @@ function AccountDetails() {
                     src="profile-image.png"
                     alt="Profile"
                 /> */}
-                { <Jazzicon diameter={80} seed={selectedWalletIndex} />}
+                {<Jazzicon diameter={80} seed={selectedWalletIndex} />}
                 <div>
                     <div className="text-xl font-semibold text-white">
                         {isEditing ? (
@@ -99,11 +100,20 @@ function AccountDetails() {
             </div>
 
             <div className="bg-gray-800 p-6 rounded-lg border border-gray-600 flex flex-col items-center gap-4 mt-6">
-                <img
+                {
+                    wallet ? <QRCodeSVG
+                        value={wallet}
+                        size={128}
+                        bgColor="#ffffff"
+                        fgColor="#000000"
+                        level="H"
+                    /> : <></>
+                }
+                {/* <img
                     src="qrCode.png"
                     alt="QR Code to receive payment"
                     className="w-32 h-32"
-                />
+                /> */}
                 <div className="text-sm text-gray-200 text-white cursor-pointer hover:underline" onClick={handleCopyAddress}>{wallet || "No wallet connected"}</div>
             </div>
 
