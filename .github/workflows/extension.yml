@@ -21,17 +21,23 @@ jobs:
       - run: npm ci
       - run: npm run build
 
+      - name: Extract version from manifest.json
+        id: get_version
+        run: |
+          VERSION=$(grep '"version"' public/manifest.json | sed -E 's/.*"version": "([^"]+)".*/\1/')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
       - name: Zip Extension
         run: |
           cd build
-          zip -r -FS ../extension.zip * --exclude '*.git*'
+          zip -r -FS ../warthog_addon.zip * --exclude '*.git*'
 
       - name: sign the extension
         uses: cardinalby/webext-buildtools-firefox-sign-xpi-action@v1
         with:
           timeoutMs: 200000
-          zipFilePath: 'extension.zip'
-          xpiFilePath: 'extension.signed.xpi'
+          zipFilePath: 'warthog_addon.zip'
+          xpiFilePath: 'warthog_addon_firefox.xpi'
           jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
           jwtSecret: ${{ secrets.FF_JWT_SECRET }}
           extensionId: ${{ secrets.FF_EXTENSION_ID }}
@@ -40,8 +46,8 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name : 1.0.3
+          tag_name : ${{ env.VERSION }}
           files: |
-            extension.zip
-            extension.signed.xpi
+            warthog_addon.zip
+            warthog_addon_firefox.xpi
 
