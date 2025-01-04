@@ -104,8 +104,8 @@ function AccountDetails() {
                     wallet ? <QRCodeSVG
                         value={wallet}
                         size={128}
-                        bgColor="#ffffff"
-                        fgColor="#000000"
+                        bgColor="#000000"
+                        fgColor="#ffffff"
                         level="H"
                     /> : <></>
                 }
