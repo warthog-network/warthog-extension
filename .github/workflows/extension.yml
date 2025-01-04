@@ -35,7 +35,7 @@ jobs:
       - name: sign the extension
         uses: cardinalby/webext-buildtools-firefox-sign-xpi-action@v1
         with:
-          timeoutMs: 200000
+          timeoutMs: 2000000
           zipFilePath: 'warthog_addon.zip'
           xpiFilePath: 'warthog_addon_firefox.xpi'
           jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
