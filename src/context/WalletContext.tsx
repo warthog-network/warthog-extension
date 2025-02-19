@@ -50,7 +50,7 @@ interface WalletContextProps {
 }
 
 const defaultNodeList = [
-    'http://193.218.118.57:3001',
+    'http://65.87.7.86:3001',
     'http://185.209.228.16:3001',
     'http://89.117.150.162:3001',
     'http://51.75.21.134:3001',
