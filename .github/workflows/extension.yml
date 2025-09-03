@@ -54,6 +54,7 @@ jobs:
         with:
           tag_name : ${{ env.VERSION }}
           files: |
+            warthog_addon_reviewer.zip
             warthog_addon.zip
             warthog_addon_firefox.xpi
 
