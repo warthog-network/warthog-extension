@@ -37,6 +37,7 @@ jobs:
           zip -r -FS ../warthog_addon.zip * --exclude '*.git*'
 
       - name: sign the extension
+        continue-on-error: true
         uses: cardinalby/webext-buildtools-firefox-sign-xpi-action@v1
         with:
           timeoutMs: 2000000
