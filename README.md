@@ -1,5 +1,7 @@
 # Warthog Wallet Extension
 
+**NOTE FOR REVIEWERS :** [Build Instruction](#-installation)
+
 The **Warthog Wallet Extension** is a feature-rich browser extension for seamless interaction with the **Warthog Network**. Built for modern browsers, it provides a secure, efficient, and user-friendly interface for managing your Warthog assets.
 
 ---
