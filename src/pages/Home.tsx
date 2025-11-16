@@ -68,10 +68,10 @@ const Home: React.FC<Props> = ({ setSelectedActivity }) => {
     }
 
     const updateBalanceUSD = () => {
-        axios.get(`${import.meta.env.VITE_APP_XEGGEX_API_URL}`)
+        axios.get(`${import.meta.env.VITE_APP_COINGECKO_API_URL}`)
             .then((response) => {
                 const data = response?.data;
-                setBalanceUSD(data?.last_price ? parseFloat(data?.last_price) : 0);
+                setBalanceUSD(data?.warthog?.usd ? parseFloat(data.warthog.usd) : 0);
             })
             .catch((error) => {
                 console.error("Error fetching balance:", error);
