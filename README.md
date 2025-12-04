@@ -34,17 +34,37 @@ Follow these steps to install and run the Warthog Wallet Extension:
    npm install
    ```
 
-3. Start the development server:
+3. Set up environment variables:
+
+   ```bash
+   cp .env.sample .env
+   ```
+
+   Edit `.env` file with your values.
+
+4. Start the development server:
 
    ```bash
    npm run dev
    ```
 
-4. Build the extension for production:
+5. Build the extension for production:
 
    ```bash
    npm run build
    ```
+
+---
+
+## ⚙️ Environment Variables
+
+Create a `.env` file from `.env.sample`:
+
+- **VITE_APP_ENCRYPTION_KEY**: Encryption key for secure data
+- **VITE_APP_COINGECKO_API_URL**: CoinGecko API for WART price (USD)
+- **VITE_APP_XEGGEX_API_URL**: Legacy Xeggex API (deprecated)
+
+---
 
 ## 📄 Manifest Files
 
