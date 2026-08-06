@@ -55,13 +55,13 @@ interface WalletContextProps {
   getAccountFromIndex: (index: number) => Account;
 }
 
+// Public nodes that respond to /chain/head (dead peers cause send failures)
 const defaultNodeList = [
-  "http://51.75.21.134:3001",
-  "http://62.72.44.89:3001",
-  "http://dev.node-s.com:3001",
+  "https://warthognode.duckdns.org",
+  "https://warthog-defitestnet.duckdns.org",
 ];
 
-const defaultNodeNameList = ["polaire", "blu & Asia", "johnnyb Us East"];
+const defaultNodeNameList = ["Mainnet (official)", "DeFi Testnet"];
 
 const WalletContext = createContext<WalletContextProps | undefined>(undefined);
 

@@ -8,9 +8,38 @@ import NetworkDropdown from "../components/NetworkDropdown";
 import useWallet from "../hooks/useWallet";
 import { formatWalletAddress } from "../utils";
 import axios from "axios";
-import { ethers } from "ethers";
-import secp256k1 from "secp256k1";
 import Jazzicon from "react-jazzicon/dist/Jazzicon";
+import {
+  Address,
+  Wart,
+  NonceId,
+  TransactionContext,
+} from "warthog-ts";
+
+/** Mainnet returns flat pin fields; DeFi nests under data.chainHead */
+function normalizeChainPin(data: Record<string, unknown>): {
+  pinHash: string;
+  pinHeight: number;
+} {
+  const nested =
+    data.chainHead && typeof data.chainHead === "object"
+      ? (data.chainHead as Record<string, unknown>)
+      : null;
+  const pinHash = String(nested?.pinHash ?? data.pinHash ?? "");
+  const pinHeight = Number(
+    nested?.pinHeight ?? nested?.height ?? data.pinHeight ?? data.height,
+  );
+  if (!pinHash || pinHash.length < 64 || !Number.isFinite(pinHeight)) {
+    throw new Error("Invalid chain head: missing pinHash/pinHeight");
+  }
+  return { pinHash, pinHeight };
+}
+
+function serializeTx(tx: Record<string, unknown>): Record<string, unknown> {
+  return JSON.parse(
+    JSON.stringify(tx, (_k, v) => (typeof v === "bigint" ? Number(v) : v)),
+  );
+}
 
 interface AccountType {
   id: number;
@@ -86,121 +115,94 @@ function SendFinalStep() {
 
     setIsProcessing(true);
     setTransactionStatus("processing");
+    setTransactionError("");
 
     try {
-      // Replace this with your actual transaction logic
-      const headResponse = (
-        await axios.get(`${nodeList[selectedNodeIndex]}/chain/head`)
-      ).data;
-      const pinHash = headResponse.data.pinHash;
-      const pinHeight = headResponse.data.pinHeight as number;
-      const nonceId = nonce + 1;
-      setNonce(nonceId);
-      const rawFeeE8 = "9999";
-      const result = (
-        await axios.get(
-          `${nodeList[selectedNodeIndex]}/tools/encode16bit/from_e8/` +
-            rawFeeE8,
-        )
-      ).data;
-      const feeE8 = result.data.roundedE8;
-
-      const buf1 = Buffer.from(pinHash, "hex");
-      const buf2 = Buffer.alloc(19);
-      buf2.writeUInt32BE(pinHeight, 0);
-      buf2.writeUInt32BE(nonceId, 4);
-      buf2.writeUInt8(0, 8);
-      buf2.writeUInt8(0, 9);
-      buf2.writeUInt8(0, 10);
-      buf2.writeBigUInt64BE(BigInt(feeE8), 11);
-      const buf3 = Buffer.from(tmpDestinationWallet?.slice(0, 40) || "", "hex");
-      const buf4 = Buffer.alloc(8);
-      const amountE8 = Math.round(amount * 100000000);
-      buf4.writeBigUInt64BE(BigInt(amountE8), 0);
-      console.log(`**** amountE8:`, amountE8);
-      const toSign = Buffer.concat([buf1, buf2, buf3, buf4]);
-      console.log(`**** toSign:`, toSign);
-
-      const signHash = ethers.sha256("0x" + toSign.toString("hex")).slice(2);
-      console.log(`**** signHash:`, signHash);
-
-      const privKey =
-        getAccountFromIndex(selectedWalletIndex).getPrivateKeyHex();
-      const signed = secp256k1.ecdsaSign(
-        Uint8Array.from(Buffer.from(signHash, "hex")),
-        Uint8Array.from(Buffer.from(privKey, "hex")),
+      const nodeBase = String(nodeList[selectedNodeIndex] || "").replace(
+        /\/$/,
+        "",
       );
-      console.log(`**** signed:`, signed);
-      const signatureWithoutRecid = Buffer.from(signed.signature);
-      console.log(`**** signatureWithoutRecid:`, signatureWithoutRecid);
-      const signatureWithoutRecidNormalized = secp256k1.signatureNormalize(
-        signed.signature,
-      );
-      let recid = signed.recid;
-      console.log(
-        `**** signatureWithoutRecidNormalized:`,
-        signatureWithoutRecidNormalized,
-      );
-      if (
-        Buffer.compare(
-          signatureWithoutRecid,
-          signatureWithoutRecidNormalized,
-        ) !== 0
-      ) {
-        recid = recid ^ 1;
+      if (!nodeBase) {
+        throw new Error("No node selected. Open Select Node and add a live peer.");
       }
-      console.log(`**** recid:`, recid);
-      const recidBuffer = Buffer.alloc(1);
-      console.log(`**** recidBuffer:`, recidBuffer);
-      recidBuffer.writeUint8(recid);
-      console.log(`**** recidBuffer:`, recidBuffer);
-      const signature65 = Buffer.concat([
-        signatureWithoutRecidNormalized,
-        recidBuffer,
-      ]);
-      console.log(`**** signature65:`, signature65);
-      const postdata = {
-        pinHeight: pinHeight,
-        nonceId: nonceId,
-        toAddr: tmpDestinationWallet || "",
-        amountE8: amountE8,
-        feeE8: feeE8,
-        signature65: signature65.toString("hex"),
-      };
 
-      console.log(`**** postdata:`, postdata);
+      const toRaw = (tmpDestinationWallet || "").trim().replace(/^0x/i, "");
+      const recipient = Address.fromHex(toRaw) ?? Address.fromRaw(toRaw);
+      if (!recipient) {
+        throw new Error("Invalid recipient address");
+      }
 
-      axios
-        .post(`${nodeList[selectedNodeIndex]}/transaction/add`, postdata)
-        .then((res) => {
-          console.log(`**** res:`, res.data);
-          if (res.data?.error) {
-            setTransactionStatus("error");
-            setTransactionError(res.data.error);
-          } else {
-            setTransactionHash(res?.data?.data?.txHash);
-            setTransactionStatus("success");
-          }
-        })
-        .catch((error) => {
-          console.log(`**** error:`, error);
-          setTransactionStatus("error");
-          setTransactionError(
-            error instanceof Error ? error.message : "Transaction failed",
-          );
-        });
+      const wartAmount = Wart.parse(String(amount));
+      if (!wartAmount || amount <= 0) {
+        throw new Error("Invalid amount");
+      }
 
-      // const result = await sendTransaction({
-      //     from: accounts[selectedWalletIndex].address,
-      //     to: tmpDestinationWallet,
-      //     amount: amount,
-      //     network: selectedNetwork?.id,
-      //     token: selectedNetwork?.name
-      // });
+      // Default fee 0.01 WART, rounded to 16-bit encoding the node accepts
+      const feeWart = Wart.parse("0.01");
+      if (!feeWart) {
+        throw new Error("Invalid fee");
+      }
+      const roundedFee = feeWart.roundedFee(true);
+
+      // Chain pin — mainnet flat or DeFi nested chainHead
+      const headResponse = (
+        await axios.get(`${nodeBase}/chain/head`, { timeout: 15000 })
+      ).data;
+      if (headResponse?.code != null && headResponse.code !== 0) {
+        throw new Error(headResponse.error || "Failed to fetch chain head");
+      }
+      const pin = normalizeChainPin(
+        (headResponse?.data || headResponse) as Record<string, unknown>,
+      );
+
+      // Prefer on-chain account nonce when available; fall back to local counter
+      const fromAccount = getAccountFromIndex(selectedWalletIndex);
+      const fromAddr = fromAccount.address.hex;
+      let chainNonce = 0;
+      try {
+        const balRes = (
+          await axios.get(`${nodeBase}/account/${fromAddr}/balance`, {
+            timeout: 15000,
+          })
+        ).data;
+        const balData = balRes?.data || balRes;
+        chainNonce = Number(balData?.nonceId) || 0;
+      } catch {
+        // ignore — some nodes omit nonce
+      }
+      const nonceId = Math.max(nonce + 1, chainNonce);
+      setNonce(nonceId);
+
+      const nonceObj = NonceId.fromNumber(nonceId);
+      if (!nonceObj) {
+        throw new Error("Invalid nonce");
+      }
+
+      const ctx = new TransactionContext(pin, roundedFee, nonceObj);
+      const tx = ctx.transferWart(fromAccount, recipient, wartAmount);
+      const payload = serializeTx(tx as Record<string, unknown>);
+
+      const res = await axios.post(`${nodeBase}/transaction/add`, payload, {
+        headers: { "Content-Type": "application/json" },
+        timeout: 20000,
+      });
+      const data = res.data;
+      if (data?.error || (data?.code != null && data.code !== 0)) {
+        throw new Error(data.error || `Transaction error code: ${data.code}`);
+      }
+
+      setTransactionHash(data?.data?.txHash || "");
+      setTransactionStatus("success");
     } catch (error) {
       setTransactionStatus("error");
+      const ax = error as {
+        response?: { data?: { error?: string; message?: string } };
+        message?: string;
+      };
       setTransactionError(
-        error instanceof Error ? error.message : "Transaction failed",
+        ax.response?.data?.error ||
+          ax.response?.data?.message ||
+          (error instanceof Error ? error.message : "Transaction failed"),
       );
     } finally {
       setIsProcessing(false);
